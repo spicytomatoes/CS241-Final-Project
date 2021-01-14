@@ -1,0 +1,58 @@
+#include "orhchart.h"
+
+ORHChart::ORHChart()
+{
+    chart = new QChart;
+    chartView = new QChartView(chart);
+    series = new QLineSeries;
+    mapper = new QVXYModelMapper(this);
+    xAxis = new QDateTimeAxis();
+    yAxis = new QValueAxis();
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    mapper->setXColumn(0);
+    mapper->setYColumn(1);
+    mapper->setSeries(series);
+    chart->addSeries(series);
+    chart->addAxis(xAxis,Qt::AlignBottom);
+    chart->addAxis(yAxis,Qt::AlignLeft);
+    chart->legend()->hide();
+    series->attachAxis(xAxis);
+    series->attachAxis(yAxis);
+}
+
+ORHChart::~ORHChart()
+{
+    delete chart;
+    delete chartView;
+    delete series;
+    delete mapper;
+    delete xAxis;
+    delete yAxis;
+}
+
+void ORHChart::setModel(SummedTableModel *m)
+{
+    model = m;
+    mapper->setModel(model);
+}
+
+void ORHChart::setXMin(const QDateTime &datetime)
+{
+    xAxis->setMin(datetime);
+}
+
+void ORHChart::setXMax(const QDateTime &datetime)
+{
+    xAxis->setMax(datetime);
+}
+
+QChartView *ORHChart::getChartView()
+{
+    return chartView;
+}
+
+void ORHChart::modelLoaded()
+{
+    
+}

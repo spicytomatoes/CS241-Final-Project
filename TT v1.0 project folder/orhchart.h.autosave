@@ -1,0 +1,44 @@
+//handles chart
+#ifndef ORHCHART_H
+#define ORHCHART_H
+
+#include "summedtablemodel.h"
+
+//debug
+#include <QDebug>
+//date
+#include <QDateTime>
+//data view & widgets
+#include <QtCharts>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+//#include <QtCharts/QCategoryAxis>
+
+
+class ORHChart : public QObject
+{
+private:
+    QChart *chart;
+    SummedTableModel *model;
+    //for line graphs
+    QLineSeries *series;
+    QVXYModelMapper *mapper;
+    QChartView *chartView;
+    QDateTimeAxis *xAxis;
+    QValueAxis *yAxis;
+
+public:
+    ORHChart();
+    ~ORHChart();
+    void setModel(SummedTableModel *model);
+    void setXMin(const QDateTime &datetime);
+    void setXMax(const QDateTime &datetime);
+    QChartView* getChartView();
+    //should be a slot?
+    void modelLoaded();
+    
+public slots:
+    void modelUpdated();
+};
+
+#endif // ORHCHART_H

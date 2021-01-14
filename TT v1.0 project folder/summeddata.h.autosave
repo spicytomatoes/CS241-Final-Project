@@ -1,0 +1,43 @@
+#ifndef SUMMEDDATA_H
+#define SUMMEDDATA_H
+
+#include <QObject>
+#include <QAbstractTableModel>
+
+//Threads
+#include <QtConcurrent>
+#include <QThread>
+#include <QFutureWatcher>
+
+class SummedData : public QAbstractTableModel
+{
+    Q_OBJECT
+
+private:
+    //this stores time interval - number of orders - avg time taken according to the location filter
+    QList<QList<int> > summedTable;
+//    //this stores key: (gridid, time interval) value: number of orders - total time taken - total revenue
+//    QHash<QString, QList<int> > table;
+    //filters
+    int startTime, endTime;
+    QList<int> locationFilter;
+
+public:
+    SummedData(QObject *parent=NULL);
+    SummedData(const QHash<QString, QList<int> > &t, QObject *parent=NULL);
+
+    void setTable(const QHash<QString, QList<int> > &t);
+    void updateSummedTable();
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    
+    int getStartTime();
+    int getEndTime();
+    int getMaxVal(const int &col);
+    int getMinVal(const int &col);
+    
+    QString debugData(int i, int j);
+
+};
+#endif // SUMMEDDATA_H

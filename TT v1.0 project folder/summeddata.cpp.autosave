@@ -1,0 +1,128 @@
+#include "summeddata.h"
+
+//this stores key: (gridid, time interval) value: number of orders - total time taken - total revenue
+QHash<QString, QList<int> > table;
+
+SummedData::SummedData(QObject *parent)
+    : QAbstractTableModel(parent)
+{
+    //temparary location filter
+    for (int i = 0; i < 100; i++)
+    {
+        locationFilter.append(i);
+    }
+}
+
+SummedData::SummedData(const QHash<QString, QList<int> > &t, QObject *parent)
+    : QAbstractTableModel(parent)
+{
+    //temparary location filter
+    for (int i = 0; i < 100; i++)
+    {
+        locationFilter.append(i);
+    }
+    setTable(t);
+}
+
+void SummedData::setTable(const QHash<QString, QList<int> > &t)
+{
+    emit beginResetModel();
+    //temporary
+    QHash<QString, QList<int> >::const_iterator i = t.find("dateRange");
+
+    startTime = i.value()[0];
+    endTime = i.value()[1];
+
+    table = t;
+    //updateSummedTable();
+
+    emit endResetModel();
+}
+
+int SummedData::rowCount(const QModelIndex & /*parent*/) const
+{
+   return (endTime-startTime)/3600;
+}
+
+int SummedData::columnCount(const QModelIndex & /*parent*/) const
+{
+    //temparory
+    if (table.size() > 1) return 4;
+    return 0;
+}
+
+QVariant SummedData::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+//    if (index.row() >= summedTable.size() || index.row() < 0)
+//        return QVariant();
+//    if (index.column() >= summedTable[index.row()].size() || index.column() < 0)
+//        return QVariant();
+    if (index.row() >= table.size()-1 || index.row() < 0)
+        return QVariant();
+    if (index.column() >= 4 || index.column() < 0)
+        return QVariant();
+    if (role == Qt::DisplayRole)
+    {
+//        if (index.column() == 0)
+//        {
+//            QDateTime dateTime;
+//            dateTime.setSecsSinceEpoch(summedTable[index.row()][index.column()]);
+//            return dateTime;
+//        }
+        //return summedTable[index.row()][index.column()];
+
+        int timeID = startTime + 3600*index.row();
+
+        if (index.column() == 0)
+        {
+            QDateTime dateTime;
+            dateTime.setSecsSinceEpoch(timeID);
+            return dateTime;
+        }
+
+        int result = 0;
+        for (int i = 0; i < locationFilter.size(); i++)
+        {
+            QString key = QString("%1").arg(locationFilter[i],3,10,QChar('0'));
+            key.append(QString("%1").arg(timeID));
+            if (table.contains(key)) {
+                QHash<QString, QList<int> >::const_iterator it = table.find(key);
+                result+=it.value()[index.column()-1];
+            }
+        }
+        return result;
+    }
+
+    return QVariant();
+}
+
+int SummedData::getStartTime()
+{
+    return startTime;
+}
+
+int SummedData::getEndTime()
+{
+    return endTime;
+}
+
+int SummedData::getMaxVal(const int &col)
+{
+    
+}
+
+int SummedData::getMinVal(const int &col)
+{
+    return 0;
+}
+
+void SummedData::updateSummedTable()
+{
+    emit beginResetModel();
+    summedTable.clear();
+}
+
+
+
